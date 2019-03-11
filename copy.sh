@@ -18,5 +18,5 @@ fi;
 
 echo "Copiando arquivos para ${path_to_copy}!!!"
 cp -r ${base_dir} ${path_to_copy}
-echo "FIM!!!"
+echo "FIM!"
 
