@@ -4,6 +4,7 @@ author: 'Criado por: Wellington Pine Omori'
 date: "`r format(Sys.Date(), '%d/%B/%Y')`"
 output:
   html_document: default
+  keep_md: yes
 abstract: |
   Este tutorial aborda conceitos básicos-avançados sobre como fazer uma análise de Correlação no R. Para quem estiver familiarizado, pode ser que este tutorial seja básico, mas ele foi construído justamente para este tipo de público. Além disto, este tutorial serve como uma documentação, pois mostra a forma de pensar para aqueles que por ventura precisem realizar este tipo de análise.
 ---
@@ -81,7 +82,7 @@ library('DT')
 #
 
 # Alterando path para o local onde realizaremos as análises
-setwd("/home/pine/Documents/CURSOS_EAD/2_Cursos_online_a_parte/2_Udemy/4_correlacao_R")
+#setwd("/home/pine/Documents/CURSOS_EAD/2_Cursos_online_a_parte/2_Udemy/4_correlacao_R")
 
 # Abrindo um arquivo *.CSV no R
 dados <- read.csv("1_Importando_dados/contabilidade.csv", sep="\t", dec=",", header=TRUE)
