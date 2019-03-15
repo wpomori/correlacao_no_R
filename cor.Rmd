@@ -400,7 +400,7 @@ normalidade(dados$IDADE)
 cor(dados[,c('GASTEDU', 'GASAUDE', 'GASLAZER')])
 r<-cor(dados$GASTEDU,dados$GASAUDE,method = "pearson")
 cor.test(dados$GASTEDU,dados$GASAUDE,method = "pearson")
-r # 0.77825 = Intensidade é de moderada a forte
+r # 0.77825 = Direção positiva e intensidade é de moderada a forte
 r^2
 ```
 
