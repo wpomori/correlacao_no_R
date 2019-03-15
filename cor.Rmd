@@ -14,9 +14,11 @@ abstract: |
 2. [Importando um Arquivo \*CSV no R](#importando)</br>
 3. [Tratamento de Dados](#tratamento)</br>
 4. [Verificando Correlações Graficamente](#verificando_gra)</br>
-5. [Verificando a suposição de normalizadade (INTRODUÇÃO)](#verificando_norm)</br>
+5. [Verificando a Suposição de Normalizadade (INTRODUÇÃO)](#verificando_norm)</br>
 6. [Editando o QQ-plot](#editando_qqplot)</br>
-7. [QQ-PLOT ENVELOPE](#qqplot_envelope)</br></br>
+7. [QQ-plot Envelope](#qqplot_envelope)</br>
+8. [Suposição de Normalidade com Testes Estatísticos](#testes_estatisticos)</br>
+9. [Coeficiente de Correlção Linear de Pearson](#pearson)</br></br>
 
 
 <center>**FONTES CONSULTADAS PARA CONSTRUIR ESTE ARQUIVO**</center></br>
@@ -82,7 +84,7 @@ library('DT')
 #
 
 # Alterando path para o local onde realizaremos as análises
-#setwd("/home/pine/Documents/CURSOS_EAD/2_Cursos_online_a_parte/2_Udemy/4_correlacao_R")
+setwd("/home/pine/Workspace/correlacao_no_R")
 
 # Abrindo um arquivo *.CSV no R
 dados <- read.csv("1_Importando_dados/contabilidade.csv", sep="\t", dec=",", header=TRUE)
@@ -334,4 +336,82 @@ envelope(dados$GASAUDE)
 envelope(dados$IDADE)
 ```
 </br></br>
+
+
+<center>**SUPOSIÇÃO DE NORMALIDADE COM TESTES ESTATÍSTICOS**</center><div id="testes_estatisticos" />
+```{r}
+# Verificando a suposição de normalidade com testes estatísticos
+# Após verificar a presença de normalidade nos dados, agora é o momento de testar esta normalidade estatísticamente
+# Os testes estatísticos testam uma hipótese, H0 (hipótese nula). Neste caso, H0 sempre levará o nome do teste, que no exemplo é de que H0 representa a normalidade dos dados (p-valor > 0.05). A hipótese alternativa é H1, ou seja, representa que os dados são não normais (p-valor < 0.05).
+
+### Por testes
+
+##install.packages("stats", dependencies=T)
+library(stats)
+##install.packages("nortest", dependencies=T)
+library(nortest)
+
+normalidade<-function(x)
+{
+
+t1 <- ks.test(x, "pnorm") # KS  * Amostras grandes *n>30
+t2 <- lillie.test(x) # Lilliefors
+t3 <- cvm.test(x) # Cramér-von Mises
+t4 <- shapiro.test(x) # Shapiro-Wilk **** Amostras pequenas n<30
+t5 <- sf.test(x) # Shapiro-Francia
+t6 <- ad.test(x) # Anderson-Darling
+t7<-pearson.test(x) # Pearson Test of Normality
+
+testes <- c(t1$method, t2$method, t3$method, t4$method, t5$method,t6$method,t7$method)
+valorp <- c(t1$p.value, t2$p.value, t3$p.value, t4$p.value, t5$p.value,t6$p.value,t7$p.value)
+
+resultados <- cbind(valorp)
+rownames(resultados) <- testes
+print(resultados, digits = 4)
+
+}
+```
+
+```{r}
+# Gasto com a saúde / lazer / educação são normalmente distribuídos (tanto nos gráficos quanto nos testes)
+# Idade é não normal (tanto nos gráficos quanto nos testes)
+normalidade(dados$GASAUDE)
+normalidade(dados$GASLAZER)
+normalidade(dados$GASTEDU)
+normalidade(dados$IDADE)
+```
+</br></br>
+
+
+<center>**COEFICIENTE DE CORRELAÇÃO LINEAR DE PEARSON**</center><div id="pearson" />
+```{r}
+# r = Coeficiente de correlação linear de person (-1 ... 0 ... -1)
+# Se r estiver próximo de -1 ou +1 a correlação é forte; se r estiver próximo do zero, a correlação é fraca (-0.5 ou +0.5); do mais é moderada
+# 0 - 0.15 = muito fraca; 0.15 - 0.30 = fraca; 0.30 - 0.60 = moderada; 0.60 - 0.80 = forte; 0.8 - 1 = muito forte
+# Tanto graficamente quanto com uso de teste confirmo que as variáveis de análise são normais
+# Nesta situação, temos dados normais com relacionamento linear
+# O Teste de Correlação de Pearson é usado para dados Lineares e normais. Por isso é importante se conhecer os dados, para usar o método mais adequado a ocasião
+# Esse coeficiente avalia duas variáveis numéricas que tenham distribuição normal e tenham relação linear (checamos graficamente e estatísticamente)
+# Quando pensamos em correlacinar variáveis temos de avaliar três pontos principais: 1) Intensidade (as variáveis podem estar fracamente correlacionadas, moderadamente correlacionadas ou fortemente correlacionadas. Se o r estiver nas extremidades (-1 ou +1, a correlação é forte)); 2) Direção, 3) Significância
+
+#Situação: Ambos variáveis são Normais e relação aproximadamente Linear --> Person
+
+#cor(x, y,method = c("pearson", "kendall", "spearman"))
+cor(dados[,c('GASTEDU', 'GASAUDE', 'GASLAZER')])
+r<-cor(dados$GASTEDU,dados$GASAUDE,method = "pearson")
+cor.test(dados$GASTEDU,dados$GASAUDE,method = "pearson")
+r # 0.77825 = Intensidade é de moderada a forte
+r^2
+```
+
+
+```{r}
+# https://rpubs.com/melinatarituba/353262
+# http://sillasgonzaga.com/material/curso_visualizacao/ggplot2-parte-ii.html
+# http://www.labape.com.br/rprimi/statR/t4.html
+# https://rstudio-pubs-static.s3.amazonaws.com/92750_99667cf2705c40b695dc8fbf39dab032.html#1
+# https://pt.stackoverflow.com/questions/6267/como-colocar-a-linha-de-regress%C3%A3o-em-um-gr%C3%A1fico
+# https://pt.stackoverflow.com/questions/203395/grafico-correla%C3%A7%C3%B5es-round
+# 
+```
 
