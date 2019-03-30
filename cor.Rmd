@@ -401,6 +401,11 @@ cor(dados[,c('GASTEDU', 'GASAUDE', 'GASLAZER')])
 r<-cor(dados$GASTEDU,dados$GASAUDE,method = "pearson")
 cor.test(dados$GASTEDU,dados$GASAUDE,method = "pearson")
 r # 0.77825 = Direção positiva e intensidade é de moderada a forte
+```
+
+```{r}
+# Como o valor de r (coefieciente de correlação de Pearson) deu 0.77825, isso mostra uma correlação linear moderada
+# Se elevar esse valor ao quadrado, verifico um resultado de 0.6056731, o que nos diz que a variabilidade com gasto na a educação é responsável por explicar 60% da vaiabilidade com gasto na saúde
 r^2
 ```
 
