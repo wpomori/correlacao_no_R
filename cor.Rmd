@@ -59,6 +59,10 @@ Podemos fazer a correlação entre qualquer tipo de variável *X* e *Y*, no enta
 Saber o tipo da variável e perfil de distribuição dos dados, são etapas importantes, pois estas informações serão fundamentais no momento em que for necessário escolher um método estatístico que será aplicado no estudo das correlações entre as variáveis. Dentro deste universo, ainda podemos verificar a relação entre variáveis 'especiais', como a Dicotômical x Ordinal e relação Parcial. Uma correlação Parcial acontece quando existe uma relação entre *X* e *Y* mas podemos exercer controle sobre uma variável *Z*.</br></br>
 
 
+DADOS LINEARES (DISTRIBUIÇÃO NORMAL): CORRELAÇÃO DE PEARSON (r), PRECISO SABER TRÊS SITUAÇÕES: 1) INTENSIDADE (-1 ... 0 ... +1), 2) DIREÇÃO/SENTIDO (r > 0 = Diretamente Proporcional; r < 0 Inversamente Proporcional) E SIGNIFICÂNCIA (H0: r = 0 (não existe correlação); H1: r != 0 (existe correlação))
+DADOS NÃO LINEARES (DISTRIBUIÇÃO NÃO NORMAL): SPEARMAN (rho) TAMBÉM TEM IDENTIFICAÇÃO DE INTENSIDADE (-1 ... 0 ... +1), DIREÇÃO/SENTIDO (rho > 0 = Diretamente Proporcional; rho < 0 Inversamente Proporcional) E SIGNIFICÃNCIA (H0: rho = 0 (não existe correlação); H1: rho != 0 (existe correlação))
+
+
 <center>**IMPORTANDO ARQUIVO \*CSV NO R**</center><div id="importando" />
 ```{r}
 # Importando bibliotecas que permitem ação de salvar este script em formato HTML e escrita em R Markdown, respectivamente
@@ -404,9 +408,87 @@ r # 0.77825 = Direção positiva e intensidade é de moderada a forte
 ```
 
 ```{r}
+# Quando elevo r ao quadrado, tenho o que é conhcido como Coeficiente de Determinação
+# Primeiro passo é escolher uma variável dependente (como Gasto com Saúde) e verificar se ela sofre interferência de alguma outra variável, como Gasto com Educação.
+# Com isso, verifico se o aumento do gasto com educação influencia o aumento de gasto com saúde, ou vice-e-versa 
+#
 # Como o valor de r (coefieciente de correlação de Pearson) deu 0.77825, isso mostra uma correlação linear moderada
-# Se elevar esse valor ao quadrado, verifico um resultado de 0.6056731, o que nos diz que a variabilidade com gasto na a educação é responsável por explicar 60% da vaiabilidade com gasto na saúde
+# Se elevar esse valor ao quadrado, verifico um resultado de 0.6056731, o que nos diz que a variabilidade com gasto na a educação é responsável por explicar 60% da vaiabilidade com gasto na saúde.
 r^2
+```
+
+```{r}
+# Matrix de Correlação de Pearson
+#
+# Quando testo o tipo de correlação entre variáveis, posso fazer essa verificação em dupla ou de forma múltipla.
+# Se quiser fazer a correlação de um par de variáveis é só usar a forma padrão da função cor: cor(x, y, method='pearson')
+# Para fazer a correlação de multiplas variáveis é só usar uma matrix no lugar do par de variáveis
+# Ao visualiza o conteúdo da variável x, verificamos que Gasto com Saúde tem forte correlação com Gasto com Educação. Por sua vez, Idade tem correlação muito fraca com as outras variáveis.
+# A Matrix produzida é uma Matrix Simétrica
+x <- cor(dados[,c(2,8:11)], method='pearson')
+x
+```
+
+```{r}
+# Além de mostrar a intensidade da correlação, números negativos e números positivos mostram a direção/sentido da correlação (Pearson, Spearman, Kendall, etc)
+# r = Coeficiente de Correlação Linear
+# Um r de 0 à 0.3 existe ausência de Correlação Linear
+# Um r de 0.3 à 0.7 é uma correlação moderada
+# Um r de 0.7 a 1.0 é uma correlação Elevada
+# Se r > 0: Correlação Diretamente Proporcional (correlação positiva)
+# Se r < 0: Correlação Inversamente Proporcinal (correlação negativa)
+#
+# Tendo Intensidade e Direção de uma Correlação, falta testar a significância desta correlação
+# Mesmo que uma correlação seja pequena (r = 0.12), ela ainda pode ser significativa
+# H0 -> hipótese nula, correlação (r) = 0 (p-valor > 0.05), ou seja, não existe correlação
+# H1 -> hipótese alternativa, Correlação (r) != 0 (p-valor < 0.05), ou seja, existe correlação
+#
+# As variáveis Idade e Gasto com Lazer possuem um r = -0.04
+# Embora baixo, não sabemos se a correlação é significativa
+# Esse teste nos diz, que a correlação (intensidade pequena) entre Idade e Gasto com Lazer não é significativa (H0 verdadeira, p-valor > 5%)
+cor.test(dados$GASLAZER, dados$IDADE, method = 'pearson')
+```
+
+```{r}
+# Testando Educação com Saúde
+# r = 0.778, p-valor = 2.2e-16 (H1 verdadeira, p-valor < 5% = Correlação Verdadeira entre Gasto com Educação e Gasto com Saúde)
+cor.test(dados$GASTEDU, dados$GASAUDE, method = 'pearson')
+```
+
+***NUMÉRICA x NUMÉRICA***
+```{R}
+# COEFICIENTE DE CORRELAÇÃO DE SPEARMAN (RHO) OU RANQUES
+# USADO PARA DADOS COM DISTRIBUIÇÃO NÃO NORMAIS (AUSÊNCIA DE CORRELAÇÃO LINEAR, GRÁFICAMENTE OS PONTOS FORMAM UMA CURVA, PARÁBOLA, ETC)
+# Na teoria, Spearman pode ser usado para dados normais e não normais
+# Spearman também tem identificação de Intensidade (-1 ... 0 ... +1), Direção/Sentido (rho > 0 = Diretamente Proporcional; rho < 0 Inversamente Proporcional) E SIGNIFICÃNCIA (H0: rho = 0 (não existe correlação) e Significância (H0: rho = 0 (não existe correlação); H1: rho != 0 (existe correlação)
+cor(dados$IDADE, dados$GASLAZER, method = 'spearman')
+```
+
+```{r}
+cor.test(dados$IDADE, dados$GASLAZER, method = 'spearman')
+```
+
+```{r}
+# Assim como Spearman, ainda podemos aplicar o coeficiente de Kendall para analisar correlação de dados não normais
+# Kendall é usado para amostra pequena, n = 30
+#
+# Nossa amostra tem 120 indivíduos (verifico com nrow(dados))
+nrow(dados)
+
+# Vamos fazer um subset para termos dados menores (10 indivíduos)
+dados2 <- dados[1:10,]
+dados2
+```
+
+```{r}
+# Com Kendall, também tenho Intensidade, Direção/Sentido e Significância
+# r = 0, próxima de 0, Intensidade da correlação é muito fraca e não tem Sentido 
+cor(dados2$IDADE, dados2$GASLAZER, method = 'kendall')
+```
+
+```{r}
+# Significância inexistente (H0 verdadeira, p-valor > 5%)
+cor.test(dados2$IDADE, dados2$GASLAZER, method = 'kendall')
 ```
 
 
